@@ -1,0 +1,28 @@
+FROM resin/%%RESIN_MACHINE_NAME%%-python
+
+# Make sure we use the init system, in case our container crashes
+ENV INITSYSTEM on
+
+# Install python dependencies and curl
+RUN apt-get update \
+	&& apt-get install \
+		python-smbus \
+		python-pip
+
+# Update pip
+RUN pip install -U setuptools
+
+# Install explorer hat specific library
+RUN pip install explorerhat
+
+# Set up our repository
+WORKDIR /usr/src/app
+
+# Import our start script and run script
+COPY setup-i2c.sh sts.py ./
+
+# Make our script executable
+RUN chmod +x setup-i2c.sh
+
+# Start our start script on initialise
+CMD ["./setup-i2c.sh"]
